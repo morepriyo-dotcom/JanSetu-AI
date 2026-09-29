@@ -14,18 +14,23 @@ import {
   Building,
   RefreshCw,
   Search,
+  UserCheck,
+  LogIn,
 } from "lucide-react";
 import { Complaint } from "@/types/complaint";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
 import { useAuth } from "@/context/AuthContext";
-import { UserCheck, LogIn } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function CitizenDashboardPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const reportHref = user ? "/report" : "/auth/gate?returnUrl=/report";
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -55,13 +60,14 @@ export default function CitizenDashboardPage() {
 
   const filteredComplaints = complaints.filter((c) => {
     if (filterStatus !== "ALL" && c.status !== filterStatus) return false;
-    if (
-      searchQuery &&
-      !c.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !c.id.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !c.description.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const match =
+        c.title.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q) ||
+        c.description.toLowerCase().includes(q) ||
+        Boolean(c.location?.address && c.location.address.toLowerCase().includes(q));
+      if (!match) return false;
     }
     return true;
   });
@@ -70,37 +76,37 @@ export default function CitizenDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       {/* User Greeting or Guest Sign-In Notice */}
       {user ? (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="p-4 rounded-3xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-blue-950/60 border border-blue-200/80 dark:border-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-bold text-slate-900 text-sm">
+              <p className="font-bold text-slate-900 dark:text-white text-sm">
                 Namaste, {user.name}
               </p>
-              <p className="text-slate-600 text-[11px]">
-                Verified Citizen Account • {user.phoneNumber || user.email} {user.ward ? `• ${user.ward}` : ""}
+              <p className="text-slate-600 dark:text-slate-400 text-[11px]">
+                Verified Citizen Account • {user.phoneNumber || user.email} {user.city ? `• ${user.city}` : ""}
               </p>
             </div>
           </div>
-          <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-300">
+          <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-[10px] border border-emerald-300 dark:border-emerald-800">
             Citizen Active Status
           </span>
         </div>
       ) : (
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="p-4 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div>
-            <p className="font-bold text-amber-950">
+            <p className="font-bold text-amber-950 dark:text-amber-200">
               Browsing as Citizen Guest
             </p>
-            <p className="text-amber-800 text-[11px] mt-0.5">
+            <p className="text-amber-800 dark:text-amber-400 text-[11px] mt-0.5">
               Sign in with your mobile number to link and track all your personal complaints across devices.
             </p>
           </div>
           <Link
             href="/login"
-            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition-colors shrink-0"
+            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition-colors shrink-0 shadow-sm"
           >
             <LogIn className="w-3.5 h-3.5" />
             <span>Citizen Sign In / OTP</span>
@@ -111,14 +117,14 @@ export default function CitizenDashboardPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 mb-1">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1">
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Citizen Portal</span>
+            <span>{t("citizenPortal")}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             My Civic Grievances Dashboard
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
             Monitor real-time resolution stages and municipal ward actions for your submitted requests.
           </p>
         </div>
@@ -126,63 +132,63 @@ export default function CitizenDashboardPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={fetchComplaints}
-            className="p-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 transition-colors"
+            className="p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
             title="Refresh dashboard"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
 
           <Link
-            href="/report"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm transition-all"
+            href={reportHref}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm shadow-blue-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Report New Issue</span>
+            <span>{t("reportIssue")}</span>
           </Link>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
+        <div className="civic-card p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Total Filed</span>
-            <Building className="w-4 h-4 text-blue-600" />
+            <Building className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="text-3xl font-black text-slate-900 font-mono">{total}</div>
-          <span className="text-[11px] text-slate-400 mt-1 block">All registered grievances</span>
+          <div className="text-3xl font-black text-slate-900 dark:text-white font-mono">{total}</div>
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">All registered grievances</span>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-sky-200 bg-sky-50/30 shadow-xs">
-          <div className="flex items-center justify-between text-sky-800 mb-2">
+        <div className="civic-card p-5 rounded-3xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 shadow-xs">
+          <div className="flex items-center justify-between text-sky-800 dark:text-sky-300 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">New Reported</span>
-            <Clock className="w-4 h-4 text-sky-600" />
+            <Clock className="w-4 h-4 text-sky-600 dark:text-sky-400" />
           </div>
-          <div className="text-3xl font-black text-sky-950 font-mono">{reported}</div>
-          <span className="text-[11px] text-sky-700 mt-1 block">Awaiting ward assignment</span>
+          <div className="text-3xl font-black text-sky-950 dark:text-sky-100 font-mono">{reported}</div>
+          <span className="text-[11px] text-sky-700 dark:text-sky-400 mt-1 block">Awaiting ward assignment</span>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-amber-200 bg-amber-50/30 shadow-xs">
-          <div className="flex items-center justify-between text-amber-800 mb-2">
+        <div className="civic-card p-5 rounded-3xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 shadow-xs">
+          <div className="flex items-center justify-between text-amber-800 dark:text-amber-300 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">In Progress</span>
-            <AlertCircle className="w-4 h-4 text-amber-600" />
+            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <div className="text-3xl font-black text-amber-950 font-mono">{inProgress}</div>
-          <span className="text-[11px] text-amber-700 mt-1 block">Ground crew active</span>
+          <div className="text-3xl font-black text-amber-950 dark:text-amber-100 font-mono">{inProgress}</div>
+          <span className="text-[11px] text-amber-700 dark:text-amber-400 mt-1 block">Ground crew active</span>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/30 shadow-xs">
-          <div className="flex items-center justify-between text-emerald-800 mb-2">
+        <div className="civic-card p-5 rounded-3xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 shadow-xs">
+          <div className="flex items-center justify-between text-emerald-800 dark:text-emerald-300 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Resolved</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="text-3xl font-black text-emerald-950 font-mono">{resolved}</div>
-          <span className="text-[11px] text-emerald-700 mt-1 block">Successfully closed</span>
+          <div className="text-3xl font-black text-emerald-950 dark:text-emerald-100 font-mono">{resolved}</div>
+          <span className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 block">Successfully closed</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Search */}
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
@@ -191,7 +197,7 @@ export default function CitizenDashboardPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by ID, issue or area..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
@@ -203,8 +209,8 @@ export default function CitizenDashboardPage() {
               onClick={() => setFilterStatus(st)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-colors ${
                 filterStatus === st
-                  ? "bg-slate-900 text-white"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                  ? "bg-slate-900 dark:bg-blue-600 text-white"
+                  : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
               }`}
             >
               {st === "ALL" ? "All Statuses" : st.replace("_", " ")}
@@ -216,90 +222,80 @@ export default function CitizenDashboardPage() {
       {/* Complaints List */}
       <div className="space-y-4">
         {loading ? (
-          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center text-slate-500">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto text-blue-600 mb-2" />
-            <p className="text-xs text-slate-500 font-medium">Loading complaints from repository...</p>
+            <p className="text-xs">Loading citizen grievances...</p>
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-2xl border border-dashed border-slate-300 space-y-3">
-            <AlertCircle className="w-8 h-8 text-slate-400 mx-auto" />
-            <h3 className="font-bold text-base text-slate-800">No complaints match your filters</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              You haven't filed any complaints matching this filter or search query.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/report"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Submit a Complaint</span>
-              </Link>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mx-auto flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">No Grievances Found</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+                No civic complaints match your active filter criteria.
+              </p>
+            </div>
+            <Link
+              href={reportHref}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Report a Problem</span>
+            </Link>
           </div>
         ) : (
-          filteredComplaints.map((c) => (
-            <div
-              key={c.id}
-              className="bg-white rounded-2xl border border-slate-200/90 hover:border-blue-400 hover:shadow-md transition-all p-5 sm:p-6"
-            >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  {/* Top Badges */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded border border-blue-200">
-                      {c.id}
-                    </span>
-                    <CategoryBadge category={c.category} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredComplaints.map((c) => (
+              <div
+                key={c.id}
+                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs hover:border-blue-400 dark:hover:border-blue-600 transition-all flex flex-col justify-between space-y-4"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
+                        {c.id}
+                      </span>
+                      <CategoryBadge category={c.category} />
+                    </div>
                     <PriorityBadge priority={c.priority} />
-                    <span className="text-xs text-slate-400 flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(c.createdAt).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
                   </div>
 
-                  {/* Title & Summary */}
-                  <h3 className="font-bold text-base sm:text-lg text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1">
                     {c.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
                     {c.summary || c.description}
                   </p>
 
-                  {/* Metadata line */}
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
-                    {c.location?.address && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate max-w-xs">{c.location.address}</span>
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1 text-slate-600 font-medium">
-                      <Building className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                      {c.department}
-                    </span>
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">{c.location?.address || "Unknown"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{new Date(c.createdAt).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right: Status badge & Action */}
-                <div className="flex lg:flex-col items-center lg:items-end justify-between gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <StatusBadge status={c.status} />
 
                   <Link
                     href={`/complaints/${c.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-800 text-xs font-bold transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
-                    <span>Track Live</span>
+                    <span>Track 4-Stage Progress</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { getAllComplaints, computeComplaintStats } from "@/lib/complaintsStore";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
+import { NationalDataIntelligence } from "@/components/NationalDataIntelligence";
 
 export default async function HomePage() {
   const complaints = await getAllComplaints();
@@ -230,6 +231,11 @@ export default async function HomePage() {
             );
           })}
         </div>
+      </section>
+
+      {/* National Open Data & Geospatial Intelligence Hub */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <NationalDataIntelligence totalComplaints={stats.total} />
       </section>
 
       {/* Recent Public Grievances Preview */}

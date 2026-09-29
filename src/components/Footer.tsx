@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { ShieldCheck, PhoneCall, Award, Heart } from "lucide-react";
+import { ShieldCheck, PhoneCall, Award, Heart, Globe, Database } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 border-t border-slate-800">
+    <footer className="bg-slate-900 dark:bg-slate-950 text-slate-300 pt-12 pb-8 border-t border-slate-800 dark:border-slate-800/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
           {/* Col 1: Brand & Purpose */}
@@ -18,7 +18,7 @@ export function Footer() {
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Bridging citizens and local municipal administration through AI. Transforming natural language civic complaints into structured, actionable municipal work orders.
+              National Digital Public Good bridging citizens and municipal administration through multimodal AI. Transforming voice and text civic grievances into structured, actionable municipal work orders.
             </p>
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-[11px] text-amber-300">
               <Award className="w-3.5 h-3.5 text-amber-400" />
@@ -52,13 +52,18 @@ export function Footer() {
                   Public Transparency Register
                 </Link>
               </li>
+              <li>
+                <Link href="/auth/gate" className="hover:text-blue-400 transition-colors">
+                  Citizen Access Gate
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Col 3: Municipal Administration */}
+          {/* Col 3: Municipal Administration & Open Datasets */}
           <div>
             <h4 className="text-sm font-semibold text-white tracking-wider uppercase mb-3">
-              Municipal Portal
+              Open Governance & Portals
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -71,11 +76,18 @@ export function Footer() {
                   Department Grievance Manager
                 </Link>
               </li>
-              <li>
-                <span className="text-slate-500">Ward Dispatch System (Live)</span>
+              <li className="pt-2 text-slate-500 flex items-center gap-1">
+                <Database className="w-3 h-3 text-cyan-400" />
+                <span>Integrated Open Datasets:</span>
               </li>
-              <li>
-                <span className="text-slate-500">SLA Performance Metrics</span>
+              <li className="text-[11px] text-slate-400 pl-4">
+                • data.gov.in & Smart Cities Mission
+              </li>
+              <li className="text-[11px] text-slate-400 pl-4">
+                • ISRO Bhuvan & IMD Weather
+              </li>
+              <li className="text-[11px] text-slate-400 pl-4">
+                • WHO Health & FAO Urban Data
               </li>
             </ul>
           </div>
@@ -109,7 +121,7 @@ export function Footer() {
 
         {/* Bottom copyright */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
-          <p>© 2026 JanSetu AI. Open Citizen Technology Platform.</p>
+          <p>© 2026 JanSetu AI. Open Citizen Technology Platform (Digital Public Good).</p>
           <p className="flex items-center gap-1 text-slate-400">
             Powered by Google Gemini AI & Next.js <Heart className="w-3.5 h-3.5 text-rose-500 inline fill-rose-500" />
           </p>

@@ -19,6 +19,7 @@ import { Complaint, ComplaintStatus, CivicCategory, ComplaintPriority } from "@/
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
 import { subscribeToComplaints } from "@/lib/complaintsStore";
 import { useAuth } from "@/context/AuthContext";
+import { NationalDataIntelligence } from "@/components/NationalDataIntelligence";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -443,6 +444,9 @@ export default function AdminDashboardPage() {
           </table>
         </div>
       </div>
+
+      {/* National Infrastructure, Geospatial & Policy Synthesis Desk */}
+      <NationalDataIntelligence totalComplaints={complaints.length} />
     </div>
   );
 }

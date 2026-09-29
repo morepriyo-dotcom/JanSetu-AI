@@ -1,21 +1,28 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { GovTopBar } from "@/components/GovTopBar";
 import { Footer } from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "JanSetu AI | AI-Powered Citizen Grievance & Public Service Assistant",
+  title: "JanSetu AI (जनसेतु) | Digital Public Good for Citizen Grievance & Public Service",
   description:
-    "Report. Understand. Resolve. JanSetu AI uses Google Gemini to turn everyday civic complaints into structured, actionable municipal service requests.",
+    "National AI-powered citizen grievance platform aggregating voice and text reports across diverse linguistic regions of India, aligned with data.gov.in, ISRO Bhuvan, IMD, and national infrastructure priorities.",
   keywords: [
     "JanSetu AI",
-    "Civic Tech",
-    "Citizen Grievance",
+    "Digital Public Good",
+    "Citizen Grievance Redressal",
+    "data.gov.in",
+    "ISRO Bhuvan",
+    "IMD Weather",
     "Municipal Corporation",
     "Gemini AI",
     "Public Service Assistant",
-    "Code for Communities",
+    "Smart Cities Mission",
+    "MoHUA",
   ],
 };
 
@@ -25,13 +32,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased flex flex-col min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900">
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        <ThemeProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <GovTopBar />
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </AuthProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

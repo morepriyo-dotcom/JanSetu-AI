@@ -16,11 +16,16 @@ import {
   Send,
   X,
   FileCheck,
+  Lock,
+  UserCheck,
 } from "lucide-react";
+import Link from "next/link";
 import { AIAnalysisResult } from "@/types/complaint";
 import { PriorityBadge, CategoryBadge } from "@/components/StatusBadge";
 import { uploadComplaintImage } from "@/lib/firebaseStorage";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { VoiceInputButton } from "@/components/VoiceInputButton";
 
 export default function ReportComplaintPage() {
   const router = useRouter();
@@ -252,19 +257,71 @@ export default function ReportComplaintPage() {
     }
   };
 
+  const { t } = useLanguage();
+
+  if (!user) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6">
+        <div className="w-16 h-16 rounded-3xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 mx-auto flex items-center justify-center shadow-lg">
+          <Lock className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-2.5 py-1 rounded-full border border-blue-200 dark:border-blue-800">
+            e-Governance Security Standard
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+            Citizen Authentication Required
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+            To prevent fraudulent reports and ensure municipal field engineers can contact you with live resolution updates, please sign in or register your citizen account.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto pt-2">
+          <Link
+            href="/login?returnUrl=/report"
+            className="py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+          >
+            <span>Sign In (OTP / Email)</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/register?returnUrl=/report"
+            className="py-3 px-4 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition-all flex items-center justify-center gap-2"
+          >
+            <span>Create New Account</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      {/* Verified Citizen Header */}
+      <div className="p-3.5 mb-6 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-2xs">
+        <div className="flex items-center gap-2">
+          <UserCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+          <span className="text-slate-700 dark:text-slate-300">
+            Filing as Verified Citizen: <strong className="text-slate-900 dark:text-white font-bold">{user.name}</strong> ({user.city || user.phoneNumber || user.email})
+          </span>
+        </div>
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800 self-start sm:self-auto">
+          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          Identity Verified
+        </span>
+      </div>
+
       {/* Page Title */}
       <div className="mb-6">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 mb-1">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1">
           <Building className="w-3.5 h-3.5" />
-          <span>Citizen Public Service Portal</span>
+          <span>{t("citizenPortal")}</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Report a Civic Problem
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {t("reportProblem")}
         </h1>
-        <p className="text-sm text-slate-600 mt-1">
-          Describe the civic issue in your own words. Google Gemini AI will automatically categorize, assign priority, and route it to the right municipal department.
+        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          {t("subtitle")}
         </p>
       </div>
 
@@ -328,18 +385,25 @@ export default function ReportComplaintPage() {
       {/* Main Flow: Form & AI Result */}
       <div className="space-y-8">
         {/* Step 1: Input Form */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8">
           <form onSubmit={handleAnalyze} className="space-y-6">
             {/* Description Input */}
             <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-bold text-slate-900 mb-1"
-              >
-                1. Describe the Civic Problem <span className="text-rose-500">*</span>
-              </label>
-              <p className="text-xs text-slate-500 mb-2">
-                Explain what happened, how severe it is, or how long the problem has existed in plain everyday language.
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-bold text-slate-900 dark:text-white"
+                >
+                  1. {t("describeIssue")} <span className="text-rose-500">*</span>
+                </label>
+                <VoiceInputButton
+                  onTranscript={(spoken) =>
+                    setDescription((prev) => (prev ? `${prev} ${spoken}` : spoken))
+                  }
+                />
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                Explain in your own words, or click the Voice Input button to speak in your language.
               </p>
               <textarea
                 id="description"
@@ -350,7 +414,7 @@ export default function ReportComplaintPage() {
                   if (aiAnalysis) setAiAnalysis(null);
                 }}
                 placeholder="e.g. There is a deep pothole near the college main gate. It has already caused two bike accidents yesterday..."
-                className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-slate-900 placeholder-slate-400 resize-y"
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-y"
                 required
               />
             </div>
