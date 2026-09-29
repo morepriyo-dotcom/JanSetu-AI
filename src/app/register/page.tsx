@@ -13,7 +13,6 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -56,14 +55,6 @@ export default function CitizenRegisterPage() {
     }
   };
 
-  const handleFillDemoCitizen = () => {
-    setName("Aarav Sharma");
-    setEmail("aarav.sharma@gmail.com");
-    setPhoneNumber("9823411201");
-    setCity("Pune (Ward 14)");
-    setPassword("Citizen@1234");
-  };
-
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50/50 via-slate-50 to-white">
       <div className="max-w-md w-full space-y-6">
@@ -82,21 +73,6 @@ export default function CitizenRegisterPage() {
           <p className="text-xs text-slate-600">
             Create your Citizen Account for Grievance Redressal
           </p>
-        </div>
-
-        {/* Demo Auto-fill Helper */}
-        <div className="flex items-center justify-between p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs">
-          <div className="flex items-center gap-2 text-blue-900 font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Quick fill demo citizen details?</span>
-          </div>
-          <button
-            type="button"
-            onClick={handleFillDemoCitizen}
-            className="text-blue-700 font-bold hover:underline"
-          >
-            Auto-fill
-          </button>
         </div>
 
         {errorMessage && (

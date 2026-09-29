@@ -7,32 +7,23 @@ import {
   AlertTriangle,
   Clock,
   CheckCircle2,
-  Flame,
   Filter,
   RefreshCw,
   Search,
-  Database,
   ArrowRight,
   ExternalLink,
   ChevronDown,
   Layers,
-  Sparkles,
 } from "lucide-react";
 import { Complaint, ComplaintStatus, CivicCategory, ComplaintPriority } from "@/types/complaint";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
-import { FirebaseModal } from "@/components/FirebaseModal";
 import { subscribeToComplaints } from "@/lib/complaintsStore";
-import { getActiveFirebaseConfig, isConfigValid } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AdminDashboardPage() {
-  const { user, quickDemoLogin } = useAuth();
+  const { user } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
-  const [seedSuccess, setSeedSuccess] = useState(false);
-  const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
-  const [isFirebaseConnected, setIsFirebaseConnected] = useState(false);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -42,11 +33,6 @@ export default function AdminDashboardPage() {
 
   // Status updating
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  const checkFirebaseStatus = () => {
-    const config = getActiveFirebaseConfig();
-    setIsFirebaseConnected(isConfigValid(config));
-  };
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -64,7 +50,6 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    checkFirebaseStatus();
     fetchComplaints();
 
     // Attach live Firestore listener
@@ -108,26 +93,6 @@ export default function AdminDashboardPage() {
       alert("Failed to update status. Please try again.");
     } finally {
       setUpdatingId(null);
-    }
-  };
-
-  // Seed demo data handler
-  const handleSeedDemoData = async () => {
-    setSeeding(true);
-    setSeedSuccess(false);
-    try {
-      const res = await fetch("/api/seed", { method: "POST" });
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setComplaints(json.data);
-        setSeedSuccess(true);
-        setTimeout(() => setSeedSuccess(false), 4000);
-      }
-    } catch (err) {
-      console.error("Seeding error:", err);
-      alert("Failed to seed demo data.");
-    } finally {
-      setSeeding(false);
     }
   };
 
@@ -188,25 +153,7 @@ export default function AdminDashboardPage() {
             className="w-full py-3.5 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
           >
             <Building2 className="w-4 h-4 text-blue-400" />
-            <span>Official Officer Sign In (Staff ID / Mobile OTP)</span>
           </Link>
-
-          <div className="relative flex py-1 items-center">
-            <div className="flex-grow border-t border-slate-200"></div>
-            <span className="flex-shrink mx-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Evaluator Fast Access
-            </span>
-            <div className="flex-grow border-t border-slate-200"></div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => quickDemoLogin("ADMIN")}
-            className="w-full py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold text-xs transition-all flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span>1-Click Test Clearance (IAS Municipal Commissioner)</span>
-          </button>
         </div>
 
         <p className="text-xs text-slate-500">
@@ -252,31 +199,6 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Firebase Connection Button */}
-          <button
-            onClick={() => setFirebaseModalOpen(true)}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-              isFirebaseConnected
-                ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
-                : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100"
-            }`}
-            title="Configure Cloud Firestore & Storage"
-          >
-            <Flame className={`w-3.5 h-3.5 ${isFirebaseConnected ? "text-emerald-600 fill-emerald-500" : "text-amber-600 fill-amber-500"}`} />
-            <span>{isFirebaseConnected ? "Firestore: Live" : "Connect Firebase"}</span>
-          </button>
-
-          {/* Seed demo data button */}
-          <button
-            onClick={handleSeedDemoData}
-            disabled={seeding}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50"
-            title="Populate 8 realistic Indian civic complaints for hackathon demo"
-          >
-            <Database className="w-3.5 h-3.5 text-amber-400" />
-            <span>{seeding ? "Populating..." : "Seed 8+ Demo Grievances"}</span>
-          </button>
-
           {/* Refresh button */}
           <button
             onClick={fetchComplaints}
@@ -295,17 +217,6 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
       </div>
-
-      {/* Seed Success Toast */}
-      {seedSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2 font-semibold">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Successfully seeded 8 realistic Indian civic complaints into the database!</span>
-          </div>
-          <span className="text-[10px] text-emerald-600">Updated just now</span>
-        </div>
-      )}
 
       {/* 5 Core Dashboard KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -348,7 +259,7 @@ export default function AdminDashboardPage() {
         {/* High/Critical Priority */}
         <div className="col-span-2 lg:col-span-1 bg-white p-5 rounded-2xl border border-rose-200 bg-rose-50/40 shadow-xs">
           <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800 block mb-1 flex items-center gap-1">
-            <Flame className="w-3.5 h-3.5 text-rose-600" />
+            <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
             High / Critical
           </span>
           <div className="text-3xl font-black text-rose-950 font-mono">{criticalOrHigh}</div>
@@ -453,7 +364,7 @@ export default function AdminDashboardPage() {
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center text-slate-500">
-                    No complaints match current filters. Click "Seed 8+ Demo Grievances" above to reload sample data.
+                    No complaints match current filters. Adjust your search or filter options.
                   </td>
                 </tr>
               ) : (
@@ -532,19 +443,6 @@ export default function AdminDashboardPage() {
           </table>
         </div>
       </div>
-
-      {/* Firebase Configuration Modal */}
-      <FirebaseModal
-        isOpen={firebaseModalOpen}
-        onClose={() => {
-          setFirebaseModalOpen(false);
-          checkFirebaseStatus();
-        }}
-        onConfigured={() => {
-          checkFirebaseStatus();
-          fetchComplaints();
-        }}
-      />
     </div>
   );
 }

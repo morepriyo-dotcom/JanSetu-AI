@@ -2,7 +2,6 @@ import React from "react";
 import { CivicCategory, ComplaintPriority, ComplaintStatus } from "@/types/complaint";
 import {
   AlertTriangle,
-  Flame,
   CheckCircle2,
   Clock,
   UserCheck,
@@ -22,7 +21,7 @@ export function PriorityBadge({ priority }: { priority: ComplaintPriority }) {
     case "CRITICAL":
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
-          <Flame className="w-3.5 h-3.5 text-rose-600" />
+          <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
           CRITICAL
         </span>
       );

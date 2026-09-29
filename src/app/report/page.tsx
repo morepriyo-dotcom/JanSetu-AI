@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { AIAnalysisResult } from "@/types/complaint";
 import { PriorityBadge, CategoryBadge } from "@/components/StatusBadge";
-import { TryDemoPresets } from "@/components/TryDemoPresets";
 import { uploadComplaintImage } from "@/lib/firebaseStorage";
 import { useAuth } from "@/context/AuthContext";
 
@@ -57,15 +56,6 @@ export default function ReportComplaintPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [locationError, setLocationError] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
-
-  // Handle Preset selection
-  const handleSelectPreset = (preset: { description: string; location: string }) => {
-    setDescription(preset.description);
-    setLocationAddress(preset.location);
-    setAiAnalysis(null);
-    setErrorMessage(null);
-    setLocationError(false);
-  };
 
   // Browser Geolocation
   const handleDetectLocation = () => {
@@ -277,9 +267,6 @@ export default function ReportComplaintPage() {
           Describe the civic issue in your own words. Google Gemini AI will automatically categorize, assign priority, and route it to the right municipal department.
         </p>
       </div>
-
-      {/* Try Demo Scenarios (1-click test for judges) */}
-      <TryDemoPresets onSelect={handleSelectPreset} />
 
       {/* Error Alert Banner */}
       {errorMessage && (

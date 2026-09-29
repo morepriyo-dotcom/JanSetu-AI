@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   Clock,
-  Flame,
   Truck,
   Droplets,
   Trash2,
@@ -67,15 +66,6 @@ export default async function HomePage() {
               >
                 <Search className="w-4 h-4 text-slate-500" />
                 <span>Track Complaint Status</span>
-              </Link>
-            </div>
-
-            {/* Quick Demo Trigger Hint */}
-            <div className="pt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>Judges & Evaluators: Check out the </span>
-              <Link href="/report" className="font-semibold text-blue-700 hover:underline">
-                1-Click Demo Scenarios on Report Page
               </Link>
             </div>
           </div>

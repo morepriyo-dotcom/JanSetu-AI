@@ -14,14 +14,13 @@ import {
   MapPin,
   CheckCircle2,
   AlertTriangle,
-  Flame,
 } from "lucide-react";
 import { Complaint, ComplaintStatus, CivicCategory, ComplaintPriority } from "@/types/complaint";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AdminComplaintsListPage() {
-  const { user, quickDemoLogin } = useAuth();
+  const { user } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -125,14 +124,6 @@ export default function AdminComplaintsListPage() {
             <Building className="w-4 h-4 text-blue-400" />
             <span>Official Officer Sign In</span>
           </Link>
-
-          <button
-            type="button"
-            onClick={() => quickDemoLogin("ADMIN")}
-            className="w-full py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold text-xs transition-all flex items-center justify-center gap-2"
-          >
-            <span>1-Click Test Clearance (Municipal Admin)</span>
-          </button>
         </div>
       </div>
     );

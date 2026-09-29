@@ -10,12 +10,10 @@ import {
   Mail,
   Phone,
   ArrowRight,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   Loader2,
   UserCheck,
-  Flame,
   Award,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -23,7 +21,7 @@ import { UserRole } from "@/types/user";
 
 export default function AdminOfficerLoginPage() {
   const router = useRouter();
-  const { signInWithEmail, sendPhoneOtp, verifyPhoneOtp, quickDemoLogin } = useAuth();
+  const { signInWithEmail, sendPhoneOtp, verifyPhoneOtp } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState<"ADMIN" | "FIELD_OFFICER">("ADMIN");
   const [selectedDepartment, setSelectedDepartment] = useState("Municipal Roads & Infrastructure Department");
@@ -112,18 +110,6 @@ export default function AdminOfficerLoginPage() {
     }
   };
 
-  const handleQuickOfficerLogin = async (role: "ADMIN" | "FIELD_OFFICER") => {
-    setLoading(true);
-    try {
-      await quickDemoLogin(role, selectedDepartment);
-      router.push("/admin");
-    } catch (err) {
-      setErrorMessage("Quick clearance failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-[90vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950 text-white">
       <div className="max-w-xl w-full space-y-6">
@@ -146,46 +132,6 @@ export default function AdminOfficerLoginPage() {
           <div className="inline-flex items-center gap-1.5 text-[11px] text-emerald-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">
             <Award className="w-3.5 h-3.5 text-emerald-400" />
             <span>e-Governance Municipal Staff Security Zone</span>
-          </div>
-        </div>
-
-        {/* 1-Click Demo Evaluation Clearance Box */}
-        <div className="bg-gradient-to-r from-blue-950/80 to-slate-800/90 border border-blue-500/50 rounded-2xl p-5 shadow-xl space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-blue-400" />
-              <span className="text-xs font-bold text-blue-200 uppercase tracking-wider">
-                Evaluation & Judge Fast-Track Clearance
-              </span>
-            </div>
-            <span className="text-[10px] font-bold bg-blue-500/30 text-blue-300 border border-blue-400/40 px-2 py-0.5 rounded-full">
-              Instant
-            </span>
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Testing municipal administrative operations? Gain clearance instantly:
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <button
-              type="button"
-              onClick={() => handleQuickOfficerLogin("ADMIN")}
-              disabled={loading}
-              className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <UserCheck className="w-4 h-4 text-amber-300" />
-              <span>Commissioner (IAS Admin)</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleQuickOfficerLogin("FIELD_OFFICER")}
-              disabled={loading}
-              className="py-2.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold border border-slate-600 shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <Building2 className="w-4 h-4 text-emerald-400" />
-              <span>Ward Field Inspector</span>
-            </button>
           </div>
         </div>
 

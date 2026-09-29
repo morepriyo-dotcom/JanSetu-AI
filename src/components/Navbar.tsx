@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -13,14 +13,11 @@ import {
   X,
   Sparkles,
   Home,
-  Flame,
   User,
   LogOut,
   ChevronDown,
   UserCheck,
 } from "lucide-react";
-import { FirebaseModal } from "@/components/FirebaseModal";
-import { isConfigValid, getActiveFirebaseConfig } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 
 export function Navbar() {
@@ -29,18 +26,7 @@ export function Navbar() {
   const { user, logout } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
-  const [isFirebaseConnected, setIsFirebaseConnected] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-
-  const checkFirebaseStatus = () => {
-    const config = getActiveFirebaseConfig();
-    setIsFirebaseConnected(isConfigValid(config));
-  };
-
-  useEffect(() => {
-    checkFirebaseStatus();
-  }, []);
 
   const isAdminArea = pathname?.startsWith("/admin");
 
@@ -116,27 +102,6 @@ export function Navbar() {
 
             {/* Action CTAs & Auth Badges */}
             <div className="hidden lg:flex items-center gap-3">
-              {/* Firebase Live Status Button */}
-              <button
-                type="button"
-                onClick={() => setFirebaseModalOpen(true)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                  isFirebaseConnected
-                    ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
-                    : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100"
-                }`}
-                title="Manage Cloud Firestore and Storage"
-              >
-                <Flame
-                  className={`w-3.5 h-3.5 ${
-                    isFirebaseConnected
-                      ? "text-emerald-600 fill-emerald-500"
-                      : "text-amber-600 fill-amber-500"
-                  }`}
-                />
-                <span>{isFirebaseConnected ? "Firebase: Live" : "Firebase: Connect"}</span>
-              </button>
-
               {/* User Authentication Menu */}
               {user ? (
                 <div className="relative">
@@ -244,14 +209,6 @@ export function Navbar() {
 
             {/* Mobile menu button */}
             <div className="flex md:hidden items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setFirebaseModalOpen(true)}
-                className="p-1.5 rounded-lg border border-slate-300 text-slate-700"
-                title="Firebase Settings"
-              >
-                <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-              </button>
               <Link
                 href="/report"
                 className="p-2 rounded-lg bg-blue-600 text-white text-xs font-semibold"
@@ -338,35 +295,9 @@ export function Navbar() {
               );
             })}
 
-            <div className="pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setFirebaseModalOpen(true);
-                }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200"
-              >
-                <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-amber-600 fill-amber-500" />
-                  <span>Configure Firebase</span>
-                </div>
-                <span>{isFirebaseConnected ? "Connected" : "Setup"}</span>
-              </button>
-            </div>
           </div>
         )}
       </header>
-
-      {/* Firebase Settings Modal */}
-      <FirebaseModal
-        isOpen={firebaseModalOpen}
-        onClose={() => {
-          setFirebaseModalOpen(false);
-          checkFirebaseStatus();
-        }}
-        onConfigured={checkFirebaseStatus}
-      />
     </>
   );
 }

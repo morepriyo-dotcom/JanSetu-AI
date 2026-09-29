@@ -9,18 +9,16 @@ import {
   Mail,
   Lock,
   ArrowRight,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   Loader2,
   Building2,
-  User,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function CitizenLoginPage() {
   const router = useRouter();
-  const { signInWithEmail, sendPhoneOtp, verifyPhoneOtp, quickDemoLogin } = useAuth();
+  const { signInWithEmail, sendPhoneOtp, verifyPhoneOtp } = useAuth();
 
   const [authMode, setAuthMode] = useState<"PHONE" | "EMAIL">("PHONE");
 
@@ -108,19 +106,6 @@ export default function CitizenLoginPage() {
     }
   };
 
-  // 1-Click Fast Citizen Login for Hackathon
-  const handleQuickCitizenLogin = async () => {
-    setLoading(true);
-    try {
-      await quickDemoLogin("CITIZEN");
-      router.push("/dashboard");
-    } catch (err: any) {
-      setErrorMessage("Quick sign-in encountered an issue.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50/50 via-slate-50 to-white">
       <div className="max-w-md w-full space-y-6">
@@ -140,33 +125,6 @@ export default function CitizenLoginPage() {
           <p className="text-xs text-slate-600">
             Citizen Grievance & Public Service Access
           </p>
-        </div>
-
-        {/* 1-Click Demo Evaluation Box */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/90 rounded-2xl p-4 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-blue-600" />
-              <span className="text-xs font-bold text-blue-950">
-                Evaluation Quick Access
-              </span>
-            </div>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-200/80 text-blue-900">
-              Instant
-            </span>
-          </div>
-          <p className="text-[11px] text-blue-700 mt-1 leading-relaxed">
-            Evaluating the citizen flow? Sign in with a verified demo citizen profile in one click:
-          </p>
-          <button
-            type="button"
-            onClick={handleQuickCitizenLogin}
-            disabled={loading}
-            className="w-full mt-3 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>1-Click Demo Citizen Login (Aarav Sharma)</span>
-          </button>
         </div>
 
         {/* Error Alert */}

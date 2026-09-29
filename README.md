@@ -82,12 +82,10 @@ JanSetu-AI/
 │   │   ├── layout.tsx                # App layout with Navbar & Footer
 │   │   └── page.tsx                  # Landing page with stats, workflow & live feed
 │   ├── components/
-│   │   ├── FirebaseModal.tsx         # Firebase Cloud Connection Dialog & Live Diagnostics
 │   │   ├── Footer.tsx                # Civic footer with emergency helplines
 │   │   ├── Navbar.tsx                # Top navigation & role indicators
 │   │   ├── StatusBadge.tsx           # Priority, Status, and Category badge components
-│   │   ├── StatusTracker.tsx         # Visual 4-stage stepper
-│   │   └── TryDemoPresets.tsx        # 1-click sample complaint presets
+│   │   └── StatusTracker.tsx         # Visual 4-stage stepper
 │   ├── context/
 │   │   └── AuthContext.tsx           # Citizen & Admin Authentication Provider
 │   ├── lib/
