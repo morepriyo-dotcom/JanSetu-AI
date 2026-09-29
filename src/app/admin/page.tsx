@@ -20,12 +20,17 @@ import {
 } from "lucide-react";
 import { Complaint, ComplaintStatus, CivicCategory, ComplaintPriority } from "@/types/complaint";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
+import { FirebaseModal } from "@/components/FirebaseModal";
+import { subscribeToComplaints } from "@/lib/complaintsStore";
+import { getActiveFirebaseConfig, isConfigValid } from "@/lib/firebase";
 
 export default function AdminDashboardPage() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
   const [seedSuccess, setSeedSuccess] = useState(false);
+  const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
+  const [isFirebaseConnected, setIsFirebaseConnected] = useState(false);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -35,6 +40,11 @@ export default function AdminDashboardPage() {
 
   // Status updating
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const checkFirebaseStatus = () => {
+    const config = getActiveFirebaseConfig();
+    setIsFirebaseConnected(isConfigValid(config));
+  };
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -52,7 +62,20 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
+    checkFirebaseStatus();
     fetchComplaints();
+
+    // Attach live Firestore listener
+    const unsub = subscribeToComplaints((liveComplaints) => {
+      if (Array.isArray(liveComplaints) && liveComplaints.length > 0) {
+        setComplaints(liveComplaints);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      if (typeof unsub === "function") unsub();
+    };
   }, []);
 
   // Update Status handler
@@ -154,6 +177,20 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Firebase Connection Button */}
+          <button
+            onClick={() => setFirebaseModalOpen(true)}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all ${
+              isFirebaseConnected
+                ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
+                : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100"
+            }`}
+            title="Configure Cloud Firestore & Storage"
+          >
+            <Flame className={`w-3.5 h-3.5 ${isFirebaseConnected ? "text-emerald-600 fill-emerald-500" : "text-amber-600 fill-amber-500"}`} />
+            <span>{isFirebaseConnected ? "Firestore: Live" : "Connect Firebase"}</span>
+          </button>
+
           {/* Seed demo data button */}
           <button
             onClick={handleSeedDemoData}
@@ -420,6 +457,19 @@ export default function AdminDashboardPage() {
           </table>
         </div>
       </div>
+
+      {/* Firebase Configuration Modal */}
+      <FirebaseModal
+        isOpen={firebaseModalOpen}
+        onClose={() => {
+          setFirebaseModalOpen(false);
+          checkFirebaseStatus();
+        }}
+        onConfigured={() => {
+          checkFirebaseStatus();
+          fetchComplaints();
+        }}
+      />
     </div>
   );
 }

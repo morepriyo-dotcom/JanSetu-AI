@@ -6,7 +6,7 @@ import {
   ComplaintPriority,
 } from "@/types/complaint";
 import { SAMPLE_COMPLAINTS } from "./demoData";
-import { db, isFirebaseConfigured } from "./firebase";
+import { getFirestoreDb, isConfigValid, getActiveFirebaseConfig } from "./firebase";
 import {
   collection,
   doc,
@@ -16,6 +16,8 @@ import {
   updateDoc,
   query,
   orderBy,
+  onSnapshot,
+  Unsubscribe,
 } from "firebase/firestore";
 
 // Server-side & client-side in-memory store initialized with realistic demo data
@@ -49,13 +51,18 @@ function saveClientStoredComplaints(complaints: Complaint[]) {
  * Fetch all complaints (from Firestore if configured, else from demo store)
  */
 export async function getAllComplaints(): Promise<Complaint[]> {
-  if (isFirebaseConfigured && db) {
+  const db = getFirestoreDb();
+  if (db) {
     try {
       const colRef = collection(db, "complaints");
       const q = query(colRef, orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
-        return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Complaint));
+        const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Complaint));
+        if (typeof window !== "undefined") {
+          saveClientStoredComplaints(list);
+        }
+        return list;
       }
     } catch (err) {
       console.warn("Firestore fetch error, falling back to local store:", err);
@@ -75,10 +82,45 @@ export async function getAllComplaints(): Promise<Complaint[]> {
 }
 
 /**
+ * Real-time listener for live complaint updates via Firestore onSnapshot
+ */
+export function subscribeToComplaints(
+  callback: (complaints: Complaint[]) => void
+): Unsubscribe | (() => void) {
+  const db = getFirestoreDb();
+  if (db && typeof window !== "undefined") {
+    try {
+      const colRef = collection(db, "complaints");
+      const q = query(colRef, orderBy("createdAt", "desc"));
+      return onSnapshot(
+        q,
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Complaint));
+            saveClientStoredComplaints(list);
+            callback(list);
+          }
+        },
+        (error) => {
+          console.warn("Firestore live subscription warning:", error);
+        }
+      );
+    } catch (e) {
+      console.warn("Failed to attach Firestore snapshot listener:", e);
+    }
+  }
+
+  // Fallback: poll or return single snapshot
+  getAllComplaints().then(callback);
+  return () => {};
+}
+
+/**
  * Get single complaint by ID
  */
 export async function getComplaintById(id: string): Promise<Complaint | null> {
-  if (isFirebaseConfigured && db) {
+  const db = getFirestoreDb();
+  if (db) {
     try {
       const docRef = doc(db, "complaints", id);
       const snapshot = await getDoc(docRef);
@@ -121,11 +163,12 @@ export async function createComplaint(
     timeline: initialTimeline,
   };
 
-  if (isFirebaseConfigured && db) {
+  const db = getFirestoreDb();
+  if (db) {
     try {
       const docRef = doc(db, "complaints", id);
       await setDoc(docRef, fullComplaint);
-      console.log(`[JanSetu AI] Complaint ${id} saved to Firestore.`);
+      console.log(`[JanSetu AI] Complaint ${id} saved to Cloud Firestore.`);
     } catch (err) {
       console.warn("Firestore save failed, persisting locally:", err);
     }
@@ -176,7 +219,8 @@ export async function updateComplaintStatus(
     timeline: updatedTimeline,
   };
 
-  if (isFirebaseConfigured && db) {
+  const db = getFirestoreDb();
+  if (db) {
     try {
       const docRef = doc(db, "complaints", id);
       await updateDoc(docRef, {
@@ -184,7 +228,7 @@ export async function updateComplaintStatus(
         updatedAt: timestamp,
         timeline: updatedTimeline,
       });
-      console.log(`[JanSetu AI] Status for ${id} updated to ${newStatus} in Firestore.`);
+      console.log(`[JanSetu AI] Status for ${id} updated to ${newStatus} in Cloud Firestore.`);
     } catch (err) {
       console.warn("Firestore update error, updating local store:", err);
     }
@@ -216,13 +260,14 @@ export async function seedDemoData(): Promise<Complaint[]> {
     saveClientStoredComplaints(SAMPLE_COMPLAINTS);
   }
 
-  if (isFirebaseConfigured && db) {
+  const db = getFirestoreDb();
+  if (db) {
     try {
       for (const sample of SAMPLE_COMPLAINTS) {
         const docRef = doc(db, "complaints", sample.id);
         await setDoc(docRef, sample);
       }
-      console.log("[JanSetu AI] Seeded 8 realistic complaints into Firestore.");
+      console.log("[JanSetu AI] Seeded 8 realistic complaints into Cloud Firestore.");
     } catch (err) {
       console.warn("Firestore seeding error:", err);
     }

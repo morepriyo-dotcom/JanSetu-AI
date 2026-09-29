@@ -20,6 +20,7 @@ import {
 import { AIAnalysisResult } from "@/types/complaint";
 import { PriorityBadge, CategoryBadge } from "@/components/StatusBadge";
 import { TryDemoPresets } from "@/components/TryDemoPresets";
+import { uploadComplaintImage } from "@/lib/firebaseStorage";
 
 export default function ReportComplaintPage() {
   const router = useRouter();
@@ -196,6 +197,18 @@ export default function ReportComplaintPage() {
     setErrorMessage(null);
 
     try {
+      // Step 2a: If image was uploaded, send to Firebase Storage
+      let finalImageUrl: string | null = null;
+      if (imageFile || imagePreview) {
+        try {
+          const uploadRes = await uploadComplaintImage(imageFile || imagePreview!);
+          finalImageUrl = uploadRes.url;
+        } catch (imgErr) {
+          console.warn("Firebase Storage upload fallback:", imgErr);
+          finalImageUrl = imagePreview || null;
+        }
+      }
+
       const payload = {
         title: aiAnalysis.issue || "Reported Civic Problem",
         description: description.trim(),
@@ -210,7 +223,7 @@ export default function ReportComplaintPage() {
           latitude,
           longitude,
         },
-        imageUrl: imagePreview || null,
+        imageUrl: finalImageUrl,
         citizenName: citizenName.trim() || "Anonymous Citizen",
         citizenPhone: citizenPhone.trim() || "",
         status: "REPORTED",
