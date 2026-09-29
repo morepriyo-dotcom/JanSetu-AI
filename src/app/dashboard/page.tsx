@@ -17,8 +17,11 @@ import {
 } from "lucide-react";
 import { Complaint } from "@/types/complaint";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
+import { useAuth } from "@/context/AuthContext";
+import { UserCheck, LogIn } from "lucide-react";
 
 export default function CitizenDashboardPage() {
+  const { user } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
@@ -65,6 +68,46 @@ export default function CitizenDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+      {/* User Greeting or Guest Sign-In Notice */}
+      {user ? (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="font-bold text-slate-900 text-sm">
+                Namaste, {user.name}
+              </p>
+              <p className="text-slate-600 text-[11px]">
+                Verified Citizen Account • {user.phoneNumber || user.email} {user.ward ? `• ${user.ward}` : ""}
+              </p>
+            </div>
+          </div>
+          <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-300">
+            Citizen Active Status
+          </span>
+        </div>
+      ) : (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div>
+            <p className="font-bold text-amber-950">
+              Browsing as Citizen Guest
+            </p>
+            <p className="text-amber-800 text-[11px] mt-0.5">
+              Sign in with your mobile number to link and track all your personal complaints across devices.
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs transition-colors shrink-0"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Citizen Sign In / OTP</span>
+          </Link>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

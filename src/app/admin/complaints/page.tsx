@@ -18,8 +18,10 @@ import {
 } from "lucide-react";
 import { Complaint, ComplaintStatus, CivicCategory, ComplaintPriority } from "@/types/complaint";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AdminComplaintsListPage() {
+  const { user, quickDemoLogin } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -93,6 +95,48 @@ export default function AdminComplaintsListPage() {
 
     return true;
   });
+
+  const isOfficerOrAdmin = user && (user.role === "ADMIN" || user.role === "FIELD_OFFICER");
+
+  if (!isOfficerOrAdmin) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 sm:py-24 text-center space-y-6">
+        <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-600 border border-amber-300 flex items-center justify-center mx-auto shadow-md">
+          <Building className="w-8 h-8" />
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+            Official Security Protocol
+          </span>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Municipal Master Ledger Restricted
+          </h1>
+          <p className="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+            Viewing and editing the Master Civic Ledger requires official administrative clearance.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 max-w-lg mx-auto shadow-sm space-y-4">
+          <Link
+            href="/admin/login"
+            className="w-full py-3.5 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+          >
+            <Building className="w-4 h-4 text-blue-400" />
+            <span>Official Officer Sign In</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => quickDemoLogin("ADMIN")}
+            className="w-full py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold text-xs transition-all flex items-center justify-center gap-2"
+          >
+            <span>1-Click Test Clearance (Municipal Admin)</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">

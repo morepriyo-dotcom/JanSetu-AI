@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ShieldCheck,
   PlusCircle,
@@ -14,16 +14,24 @@ import {
   Sparkles,
   Home,
   Flame,
-  Database,
+  User,
+  LogOut,
+  ChevronDown,
+  UserCheck,
 } from "lucide-react";
 import { FirebaseModal } from "@/components/FirebaseModal";
 import { isConfigValid, getActiveFirebaseConfig } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
   const [isFirebaseConnected, setIsFirebaseConnected] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const checkFirebaseStatus = () => {
     const config = getActiveFirebaseConfig();
@@ -43,6 +51,12 @@ export function Navbar() {
     { href: "/complaints", label: "Public Tracker", icon: FileSearch },
     { href: "/admin", label: "Admin Portal", icon: Building2 },
   ];
+
+  const handleLogout = async () => {
+    await logout();
+    setUserDropdownOpen(false);
+    router.push("/");
+  };
 
   return (
     <>
@@ -100,7 +114,7 @@ export function Navbar() {
               })}
             </nav>
 
-            {/* Action CTAs & Firebase Pill */}
+            {/* Action CTAs & Auth Badges */}
             <div className="hidden lg:flex items-center gap-3">
               {/* Firebase Live Status Button */}
               <button
@@ -111,17 +125,119 @@ export function Navbar() {
                     ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
                     : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100"
                 }`}
-                title="Click to manage Firebase Firestore and Storage connection"
+                title="Manage Cloud Firestore and Storage"
               >
-                <Flame className={`w-3.5 h-3.5 ${isFirebaseConnected ? "text-emerald-600 fill-emerald-500" : "text-amber-600 fill-amber-500"}`} />
-                <span>{isFirebaseConnected ? "Firebase: Cloud Connected" : "Firebase: Connect"}</span>
+                <Flame
+                  className={`w-3.5 h-3.5 ${
+                    isFirebaseConnected
+                      ? "text-emerald-600 fill-emerald-500"
+                      : "text-amber-600 fill-amber-500"
+                  }`}
+                />
+                <span>{isFirebaseConnected ? "Firebase: Live" : "Firebase: Connect"}</span>
               </button>
+
+              {/* User Authentication Menu */}
+              {user ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white text-xs font-semibold text-slate-800 shadow-2xs"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[11px]">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="truncate max-w-[120px]">{user.name}</span>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
+                        user.role === "ADMIN"
+                          ? "bg-purple-100 text-purple-800"
+                          : user.role === "FIELD_OFFICER"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-emerald-100 text-emerald-800"
+                      }`}
+                    >
+                      {user.role === "ADMIN"
+                        ? "Admin"
+                        : user.role === "FIELD_OFFICER"
+                        ? "Officer"
+                        : "Citizen"}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {userDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 text-xs">
+                      <div className="px-4 py-2 border-b border-slate-100">
+                        <p className="font-bold text-slate-900">{user.name}</p>
+                        <p className="text-[11px] text-slate-500 truncate">
+                          {user.email || user.phoneNumber}
+                        </p>
+                        {user.designation && (
+                          <p className="text-[10px] text-blue-700 font-semibold mt-0.5">
+                            {user.designation}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="py-1">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700"
+                        >
+                          <LayoutDashboard className="w-3.5 h-3.5 text-slate-400" />
+                          <span>My Grievance Dashboard</span>
+                        </Link>
+                        {user.role !== "CITIZEN" && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700 font-semibold"
+                          >
+                            <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Municipal Operations Desk</span>
+                          </Link>
+                        )}
+                      </div>
+
+                      <div className="pt-1 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-rose-600 hover:bg-rose-50 font-semibold"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/login"
+                    className="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
+                  >
+                    Citizen Sign In
+                  </Link>
+                  <Link
+                    href="/admin/login"
+                    className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors"
+                  >
+                    Official Portal
+                  </Link>
+                </div>
+              )}
 
               <Link
                 href="/report"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm shadow-blue-500/30 transition-all hover:shadow-md"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-500/30 transition-all hover:shadow-md"
               >
-                <PlusCircle className="w-4 h-4" />
+                <PlusCircle className="w-3.5 h-3.5" />
                 <span>Report Issue</span>
               </Link>
             </div>
@@ -157,6 +273,40 @@ export function Navbar() {
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            {/* User profile summary on mobile if logged in */}
+            {user ? (
+              <div className="p-3 mb-2 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-xs text-slate-900">{user.name}</p>
+                  <p className="text-[10px] text-slate-500">{user.role}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-xs font-bold text-rose-600"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 mb-2 pb-2 border-b border-slate-100">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2 text-center rounded-lg border border-slate-300 text-xs font-bold text-slate-700"
+                >
+                  Citizen Login
+                </Link>
+                <Link
+                  href="/admin/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2 text-center rounded-lg bg-slate-900 text-white text-xs font-bold"
+                >
+                  Officer Login
+                </Link>
+              </div>
+            )}
+
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive =

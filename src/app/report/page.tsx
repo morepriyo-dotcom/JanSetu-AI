@@ -21,9 +21,11 @@ import { AIAnalysisResult } from "@/types/complaint";
 import { PriorityBadge, CategoryBadge } from "@/components/StatusBadge";
 import { TryDemoPresets } from "@/components/TryDemoPresets";
 import { uploadComplaintImage } from "@/lib/firebaseStorage";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ReportComplaintPage() {
   const router = useRouter();
+  const { user } = useAuth();
 
   // Form states
   const [description, setDescription] = useState("");
@@ -32,6 +34,14 @@ export default function ReportComplaintPage() {
   const [longitude, setLongitude] = useState<number | null>(null);
   const [citizenName, setCitizenName] = useState("");
   const [citizenPhone, setCitizenPhone] = useState("");
+
+  // Pre-fill user profile if logged in
+  React.useEffect(() => {
+    if (user) {
+      if (!citizenName) setCitizenName(user.name);
+      if (!citizenPhone && user.phoneNumber) setCitizenPhone(user.phoneNumber);
+    }
+  }, [user]);
 
   // Image states
   const [imageFile, setImageFile] = useState<File | null>(null);
