@@ -18,6 +18,8 @@ import { getComplaintById } from "@/lib/complaintsStore";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
 import { StatusTracker } from "@/components/StatusTracker";
 
+export const dynamic = "force-dynamic";
+
 export default async function ComplaintDetailPage({
   params,
 }: {
