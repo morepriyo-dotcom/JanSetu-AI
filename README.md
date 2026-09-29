@@ -24,16 +24,23 @@ Citizens often struggle when facing everyday civic problems:
    - Intelligent detection of missing location (`locationRequired: true`).
    - Priority classification (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
    - Departmental routing (`ROADS`, `WATER`, `SANITATION`, `ELECTRICITY`, `STREETLIGHT`, `DRAINAGE`, `PUBLIC_SAFETY`, `OTHER`).
-4. **Resilient Dual-Mode Data Architecture**:
-   - Production Firebase Firestore synchronization when environment variables are supplied.
+4. **National Multi-Role Authentication**:
+   - Public Citizen Portal (`/login`, `/register`) with Phone OTP simulated verification and Email authentication.
+   - Dedicated Municipal Administration & Field Officer Portal (`/admin/login`) with secure credential verification and route guards.
+5. **Firebase Cloud Storage for Evidence**:
+   - Direct image photo upload integration for damaged infrastructure, potholes, garbage heaps, and broken streetlights.
+6. **Resilient Dual-Mode Data Architecture**:
+   - Production Firebase Firestore synchronization and live real-time snapshot listeners when credentials are active.
    - Zero-config Reactive Local/Memory Store fallback so judges and developers can run and test the application immediately with zero setup bottlenecks.
-5. **Live 4-Stage Civic Tracking**:
+7. **Live 4-Stage Civic Tracking**:
    `Reported ➔ Assigned ➔ In Progress ➔ Resolved` with timestamps, notes, and staff updates.
-6. **Administrative Municipal Portal**:
+8. **Administrative Municipal Portal**:
    - Real-time KPI analytics (Total, Open, In Progress, Resolved, Critical/High Priority).
    - Dynamic filters by Category, Priority, and Status.
    - Interactive live status modifier with immediate database persistence.
    - 1-click **"Seed 8+ Demo Grievances"** button for instant demonstration.
+9. **Production-Ready Security Rules**:
+   - Included `firestore.rules` and `firestore.indexes.json` safeguarding citizen complaints and admin updates.
 
 ---
 
@@ -42,7 +49,8 @@ Citizens often struggle when facing everyday civic problems:
 - **Framework**: Next.js 15 (App Router, React 19, TypeScript)
 - **Styling**: Tailwind CSS, Lucide Icons, Mobile-first responsive civic theme
 - **AI Engine**: Google Gemini API (`@google/generative-ai` with `gemini-1.5-flash` server-side)
-- **Database**: Firebase Firestore (`complaints` collection) with dual-mode in-memory/localStorage fallback
+- **Database & Storage**: Firebase Firestore (`complaints` collection) & Firebase Cloud Storage (`complaints/` photo bucket)
+- **Authentication**: Firebase Authentication + Multi-Role context (Citizen & Municipal Admin)
 - **Location**: Browser Geolocation API + OpenStreetMap Nominatim reverse geocoding
 
 ---
@@ -55,6 +63,7 @@ JanSetu-AI/
 │   ├── app/
 │   │   ├── admin/
 │   │   │   ├── complaints/page.tsx   # Master Complaints Ledger
+│   │   │   ├── login/page.tsx        # Official Municipal Admin Login
 │   │   │   └── page.tsx              # Admin Analytics & Triage Desk
 │   │   ├── api/
 │   │   │   ├── ai/analyze/route.ts   # Server-side Gemini AI analysis endpoint
@@ -66,23 +75,32 @@ JanSetu-AI/
 │   │   │   ├── [id]/page.tsx         # Citizen single complaint tracker & visual stepper
 │   │   │   └── page.tsx              # Public complaints search directory
 │   │   ├── dashboard/page.tsx        # Citizen personal dashboard
+│   │   ├── login/page.tsx            # Citizen Login (Phone OTP / Email)
+│   │   ├── register/page.tsx         # Citizen Registration
 │   │   ├── report/page.tsx           # Citizen report form + Gemini live analysis preview
 │   │   ├── globals.css               # Civic styling & animations
 │   │   ├── layout.tsx                # App layout with Navbar & Footer
 │   │   └── page.tsx                  # Landing page with stats, workflow & live feed
 │   ├── components/
+│   │   ├── FirebaseModal.tsx         # Firebase Cloud Connection Dialog & Live Diagnostics
 │   │   ├── Footer.tsx                # Civic footer with emergency helplines
 │   │   ├── Navbar.tsx                # Top navigation & role indicators
 │   │   ├── StatusBadge.tsx           # Priority, Status, and Category badge components
 │   │   ├── StatusTracker.tsx         # Visual 4-stage stepper
 │   │   └── TryDemoPresets.tsx        # 1-click sample complaint presets
+│   ├── context/
+│   │   └── AuthContext.tsx           # Citizen & Admin Authentication Provider
 │   ├── lib/
 │   │   ├── complaintsStore.ts        # Unified database repository (Firestore + fallback)
 │   │   ├── demoData.ts               # 8 realistic Indian civic complaints & presets
 │   │   ├── firebase.ts               # Firebase Firestore client setup
+│   │   ├── firebaseAuth.ts           # Firebase Auth & Mock Auth bridge
+│   │   ├── firebaseStorage.ts        # Firebase Cloud Storage image upload handler
 │   │   └── gemini.ts                 # Gemini AI triage & heuristic engine
 │   └── types/
 │       └── complaint.ts              # TypeScript interfaces for complaints & AI schema
+├── firestore.rules                   # Production Cloud Firestore security rules
+├── firestore.indexes.json            # Firestore composite index definitions
 ├── .env.example                      # Environment variables template
 ├── next.config.mjs                   # Next.js configuration
 ├── package.json                      # Project dependencies & scripts
