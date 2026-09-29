@@ -1,0 +1,36 @@
+type User @table {
+  email: String!
+  role: String!
+  name: String!
+  department: Department
+}
+
+type Department @table {
+  name: String!
+  contactEmail: String!
+  officeLocation: String
+}
+
+type Official @table {
+  name: String!
+  positionTitle: String!
+  department: Department!
+}
+
+type Report @table {
+  title: String!
+  description: String!
+  status: String!
+  category: String!
+  locationGeoPoint: String!
+  createdAt: Timestamp!
+  imageUrl: String
+  resolutionNotes: String
+  submitter: User!
+}
+
+type FollowerSubscription @table {
+  user: User!
+  targetType: String!
+  targetId: UUID!
+}

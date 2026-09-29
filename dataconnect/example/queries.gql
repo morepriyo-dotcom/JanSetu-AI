@@ -1,0 +1,134 @@
+mutation CreateUser @auth(level: USER) {
+  user_insert(data: {id_expr: "auth.uid", email: "user@example.com", name: "New User", role: "Member"})
+}
+
+mutation UpdateUser @auth(level: USER) {
+  user_update(key: {id_expr: "auth.uid"}, data: {name: "Updated Name"})
+}
+
+mutation DeleteUser @auth(level: USER) {
+  user_delete(key: {id_expr: "auth.uid"})
+}
+
+query GetCurrentUser @auth(level: USER) {
+  user(key: {id_expr: "auth.uid"}) {
+    id
+    name
+    email
+  }
+}
+
+query ListUsers @auth(level: PUBLIC, insecureReason: "Public directory of users") {
+  users {
+    id
+    name
+    role
+  }
+}
+
+mutation CreateDepartment @auth(level: USER) {
+  department_insert(data: {name: "Engineering", contactEmail: "eng@example.com"})
+}
+
+mutation UpdateDepartment($id: UUID!, $email: String!) @auth(level: USER) {
+  department_update(id: $id, data: {contactEmail: $email})
+}
+
+mutation DeleteDepartment($id: UUID!) @auth(level: USER) {
+  department_delete(id: $id)
+}
+
+query GetDepartment($id: UUID!) @auth(level: PUBLIC, insecureReason: "Publicly accessible departments") {
+  department(id: $id) {
+    name
+    contactEmail
+  }
+}
+
+query ListDepartments @auth(level: PUBLIC, insecureReason: "Publicly accessible departments") {
+  departments {
+    name
+    officeLocation
+  }
+}
+
+mutation CreateOfficial($name: String!, $title: String!, $deptId: UUID!) @auth(level: USER) {
+  official_insert(data: {name: $name, positionTitle: $title, departmentId: $deptId})
+}
+
+mutation UpdateOfficial($id: UUID!, $title: String!) @auth(level: USER) {
+  official_update(id: $id, data: {positionTitle: $title})
+}
+
+mutation DeleteOfficial($id: UUID!) @auth(level: USER) {
+  official_delete(id: $id)
+}
+
+query GetOfficial($id: UUID!) @auth(level: PUBLIC, insecureReason: "Publicly accessible officials") {
+  official(id: $id) {
+    name
+    positionTitle
+  }
+}
+
+query ListOfficials @auth(level: PUBLIC, insecureReason: "Publicly accessible officials") {
+  officials {
+    name
+    positionTitle
+  }
+}
+
+mutation CreateReport($title: String!, $desc: String!, $cat: String!, $geo: String!) @auth(level: USER) {
+  report_insert(data: {
+    submitterId_expr: "auth.uid",
+    title: $title,
+    description: $desc,
+    status: "Open",
+    category: $cat,
+    locationGeoPoint: $geo,
+    createdAt_expr: "request.time"
+  })
+}
+
+mutation UpdateReportStatus($id: UUID!, $status: String!) @auth(level: USER) {
+  report_update(id: $id, data: {status: $status})
+}
+
+mutation DeleteReport($id: UUID!) @auth(level: USER) {
+  report_delete(id: $id)
+}
+
+query GetReport($id: UUID!) @auth(level: USER) {
+  report(id: $id) {
+    title
+    status
+    submitter { name }
+  }
+}
+
+query ListUserReports @auth(level: USER) {
+  reports(where: {submitterId: {eq_expr: "auth.uid"}}) {
+    title
+    status
+    createdAt
+  }
+}
+
+mutation CreateSubscription($type: String!, $targetId: UUID!) @auth(level: USER) {
+  followerSubscription_insert(data: {
+    userId_expr: "auth.uid",
+    targetType: $type,
+    targetId: $targetId
+  })
+}
+
+mutation DeleteSubscription($id: UUID!) @auth(level: USER) {
+  followerSubscription_delete(id: $id)
+}
+
+query ListMySubscriptions @auth(level: USER) {
+  followerSubscriptions(where: {userId: {eq_expr: "auth.uid"}}) {
+    targetType
+    targetId
+  }
+}

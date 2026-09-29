@@ -1,0 +1,27 @@
+mutation CreateSeedData @transaction {
+  department_insertMany(data: [
+    { id: "00000000-0000-0000-0000-000000000001", name: "Engineering", contactEmail: "eng@example.com", officeLocation: "Building A" },
+    { id: "00000000-0000-0000-0000-000000000002", name: "Human Resources", contactEmail: "hr@example.com", officeLocation: "Building B" },
+    { id: "00000000-0000-0000-0000-000000000003", name: "Operations", contactEmail: "ops@example.com", officeLocation: "Building C" }
+  ])
+  user_insertMany(data: [
+    { id: "10000000-0000-0000-0000-000000000001", email: "alice@example.com", role: "Admin", name: "Alice", departmentId: "00000000-0000-0000-0000-000000000001" },
+    { id: "10000000-0000-0000-0000-000000000002", email: "bob@example.com", role: "User", name: "Bob", departmentId: "00000000-0000-0000-0000-000000000002" },
+    { id: "10000000-0000-0000-0000-000000000003", email: "charlie@example.com", role: "User", name: "Charlie", departmentId: "00000000-0000-0000-0000-000000000003" }
+  ])
+  official_insertMany(data: [
+    { name: "Dave", positionTitle: "Lead Engineer", departmentId: "00000000-0000-0000-0000-000000000001" },
+    { name: "Eve", positionTitle: "HR Manager", departmentId: "00000000-0000-0000-0000-000000000002" },
+    { name: "Frank", positionTitle: "Ops Coordinator", departmentId: "00000000-0000-0000-0000-000000000003" }
+  ])
+  report_insertMany(data: [
+    { title: "Leak in Hallway", description: "Water dripping from ceiling", status: "Open", category: "Maintenance", locationGeoPoint: "40.7128,-74.0060", createdAt: "2023-10-27T10:00:00Z", submitterId: "10000000-0000-0000-0000-000000000001" },
+    { title: "Broken Light", description: "Fluorescent light flickering", status: "Resolved", category: "Facilities", locationGeoPoint: "40.7129,-74.0061", createdAt: "2023-10-28T09:00:00Z", submitterId: "10000000-0000-0000-0000-000000000002" },
+    { title: "Network Outage", description: "Wi-fi down in Wing B", status: "Open", category: "IT", locationGeoPoint: "40.7130,-74.0062", createdAt: "2023-10-29T14:30:00Z", submitterId: "10000000-0000-0000-0000-000000000003" }
+  ])
+  followerSubscription_insertMany(data: [
+    { userId: "10000000-0000-0000-0000-000000000001", targetType: "Report", targetId: "00000000-0000-0000-0000-000000000001" },
+    { userId: "10000000-0000-0000-0000-000000000002", targetType: "Report", targetId: "00000000-0000-0000-0000-000000000002" },
+    { userId: "10000000-0000-0000-0000-000000000003", targetType: "Department", targetId: "00000000-0000-0000-0000-000000000003" }
+  ])
+}
