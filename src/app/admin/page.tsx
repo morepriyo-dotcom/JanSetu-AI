@@ -154,6 +154,7 @@ export default function AdminDashboardPage() {
             className="w-full py-3.5 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
           >
             <Building2 className="w-4 h-4 text-blue-400" />
+            <span>Official Officer Sign In</span>
           </Link>
         </div>
 

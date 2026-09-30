@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.gitignore
+.env*.local
+*.tsbuildinfo
+README.md
+functions/node_modules
+dataconnect

@@ -80,16 +80,15 @@ export default function ReportComplaintPage() {
         setLongitude(lon);
 
         try {
-          // Reverse geocode via OpenStreetMap Nominatim
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-          );
+          // Reverse geocode via server-side compliant geocode endpoint
+          const res = await fetch(`/api/geocode?lat=${lat}&lon=${lon}`);
           if (res.ok) {
             const data = await res.json();
-            const addr =
-              data.display_name ||
-              `${data.address?.road || ""}, ${data.address?.suburb || ""}, ${data.address?.city || ""}`.trim();
-            setLocationAddress(addr || `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
+            if (data.success && data.address) {
+              setLocationAddress(data.address);
+            } else {
+              setLocationAddress(`Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}`);
+            }
           } else {
             setLocationAddress(`Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}`);
           }
@@ -109,24 +108,85 @@ export default function ReportComplaintPage() {
     );
   };
 
-  // Image Upload Handler
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // High-performance client-side image compression (prevents 413 Payload Too Large & Firestore 1MB limits)
+  const compressImage = (file: File, maxWidth = 1200, quality = 0.75): Promise<{ compressedFile: File; dataUrl: string }> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth || height > maxWidth) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxWidth) / height);
+              height = maxWidth;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            const rawUrl = e.target?.result as string;
+            resolve({ compressedFile: file, dataUrl: rawUrl });
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/jpeg", quality);
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressed = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+                  type: "image/jpeg",
+                });
+                resolve({ compressedFile: compressed, dataUrl });
+              } else {
+                resolve({ compressedFile: file, dataUrl });
+              }
+            },
+            "image/jpeg",
+            quality
+          );
+        };
+        img.onerror = () => resolve({ compressedFile: file, dataUrl: e.target?.result as string });
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve({ compressedFile: file, dataUrl: "" });
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Image Upload Handler with Automatic Compression
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setErrorMessage("Image file size should be less than 5MB.");
+    if (file.size > 15 * 1024 * 1024) {
+      setErrorMessage("Image file size should be less than 15MB.");
       return;
     }
 
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const b64 = reader.result as string;
-      setImagePreview(b64);
-      setImageBase64(b64);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const { compressedFile, dataUrl } = await compressImage(file, 1200, 0.75);
+      setImageFile(compressedFile);
+      setImagePreview(dataUrl);
+      setImageBase64(dataUrl);
+      setErrorMessage(null);
+    } catch (err) {
+      console.warn("Image compression fallback:", err);
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const b64 = reader.result as string;
+        setImagePreview(b64);
+        setImageBase64(b64);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const removeImage = () => {

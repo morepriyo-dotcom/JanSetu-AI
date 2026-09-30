@@ -66,13 +66,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Persist to .env.local
-    const envPath = path.join(process.cwd(), ".env.local");
-    let envContent = "";
-    if (fs.existsSync(envPath)) {
-      envContent = fs.readFileSync(envPath, "utf-8");
+    // Attempt to persist to .env.local if filesystem is writable (local dev), otherwise skip gracefully on serverless
+    let filePersisted = false;
+    try {
+      const envPath = path.join(process.cwd(), ".env.local");
+      let envContent = "";
+      if (fs.existsSync(envPath)) {
+        envContent = fs.readFileSync(envPath, "utf-8");
+      }
+
+      const updates: Record<string, string> = {
+        NEXT_PUBLIC_FIREBASE_API_KEY: apiKey,
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: authDomain || `${projectId}.firebaseapp.com`,
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: projectId,
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: storageBucket || `${projectId}.appspot.com`,
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: messagingSenderId || "",
+        NEXT_PUBLIC_FIREBASE_APP_ID: appId || "",
+      };
+
+      let updatedContent = envContent;
+      for (const [key, val] of Object.entries(updates)) {
+        const regex = new RegExp(`^${key}=.*$`, "m");
+        if (regex.test(updatedContent)) {
+          updatedContent = updatedContent.replace(regex, `${key}=${val}`);
+        } else {
+          updatedContent += `\n${key}=${val}`;
+        }
+      }
+
+      fs.writeFileSync(envPath, updatedContent.trim() + "\n", "utf-8");
+      filePersisted = true;
+    } catch (fsErr: any) {
+      console.warn(
+        "[JanSetu AI] Filesystem is read-only (Serverless environment). Skipping .env.local write:",
+        fsErr?.message || fsErr
+      );
     }
 
+    // Also update current process.env for this runtime instance
     const updates: Record<string, string> = {
       NEXT_PUBLIC_FIREBASE_API_KEY: apiKey,
       NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: authDomain || `${projectId}.firebaseapp.com`,
@@ -82,27 +113,17 @@ export async function POST(req: NextRequest) {
       NEXT_PUBLIC_FIREBASE_APP_ID: appId || "",
     };
 
-    let updatedContent = envContent;
-    for (const [key, val] of Object.entries(updates)) {
-      const regex = new RegExp(`^${key}=.*$`, "m");
-      if (regex.test(updatedContent)) {
-        updatedContent = updatedContent.replace(regex, `${key}=${val}`);
-      } else {
-        updatedContent += `\n${key}=${val}`;
-      }
-    }
-
-    fs.writeFileSync(envPath, updatedContent.trim() + "\n", "utf-8");
-
-    // Also update current process.env
     for (const [key, val] of Object.entries(updates)) {
       process.env[key] = val;
     }
 
     return NextResponse.json({
       success: true,
-      message: "Firebase configuration validated and saved successfully!",
+      message: filePersisted
+        ? "Firebase configuration validated and saved to .env.local successfully!"
+        : "Firebase configuration validated and active for this session! (For permanent serverless deployment, also configure these variables in your hosting dashboard).",
       storageTested: testResult.storageSuccess,
+      filePersisted,
     });
   } catch (error: any) {
     console.error("Firebase config save error:", error);

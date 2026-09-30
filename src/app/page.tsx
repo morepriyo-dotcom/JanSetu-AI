@@ -19,6 +19,8 @@ import { getAllComplaints, computeComplaintStats } from "@/lib/complaintsStore";
 import { PriorityBadge, StatusBadge, CategoryBadge } from "@/components/StatusBadge";
 import { NationalDataIntelligence } from "@/components/NationalDataIntelligence";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const complaints = await getAllComplaints();
   const stats = computeComplaintStats(complaints);
