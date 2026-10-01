@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { JanSetuLogo } from "@/components/JanSetuLogo";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -51,9 +52,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
+            <JanSetuLogo size={40} />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">

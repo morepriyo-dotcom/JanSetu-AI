@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ShieldCheck, PhoneCall, Award, Heart, Globe, Database } from "lucide-react";
+import { JanSetuLogo } from "@/components/JanSetuLogo";
 
 export function Footer() {
   return (
@@ -10,9 +11,7 @@ export function Footer() {
           {/* Col 1: Brand & Purpose */}
           <div className="md:col-span-1 space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
+              <JanSetuLogo size={36} />
               <span className="text-white font-extrabold text-lg tracking-tight">
                 JanSetu<span className="text-blue-400">.AI</span>
               </span>

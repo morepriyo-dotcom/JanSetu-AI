@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Background Shield Gradient -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="50%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Bridge Arch Gradient -->
+    <linearGradient id="bridgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#60A5FA" />
+    </linearGradient>
+
+    <!-- Star Glow Gradient -->
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#EA580C" />
+    </linearGradient>
+
+    <!-- Tri-Color Arc Gradients -->
+    <linearGradient id="saffronGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9933" />
+      <stop offset="100%" stop-color="#EA580C" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Rounded Shield -->
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#shieldGrad)" stroke="#38BDF8" stroke-width="3" stroke-opacity="0.6"/>
+
+  <!-- Subtle Inner Ring -->
+  <rect x="10" y="10" width="108" height="108" rx="24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.15"/>
+
+  <!-- Saffron Civic Accent Arc (Top Left) -->
+  <path d="M 22 28 C 36 18, 52 18, 64 20" fill="none" stroke="url(#saffronGrad)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- India Green Civic Accent Arc (Bottom Right) -->
+  <path d="M 64 108 C 78 108, 94 106, 106 96" fill="none" stroke="url(#greenGrad)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Bridge Pillars (Citizen & Administration) -->
+  <!-- Left Pillar (Jan / Citizen) -->
+  <rect x="26" y="56" width="8" height="42" rx="4" fill="#38BDF8" opacity="0.9"/>
+  <!-- Right Pillar (Prashasan / Administration) -->
+  <rect x="94" y="56" width="8" height="42" rx="4" fill="#60A5FA" opacity="0.9"/>
+
+  <!-- Suspension Cable Diagonals -->
+  <line x1="30" y1="56" x2="64" y2="40" stroke="#93C5FD" stroke-width="2" stroke-dasharray="3,2" opacity="0.8"/>
+  <line x1="98" y1="56" x2="64" y2="40" stroke="#93C5FD" stroke-width="2" stroke-dasharray="3,2" opacity="0.8"/>
+  <line x1="44" y1="62" x2="64" y2="40" stroke="#93C5FD" stroke-width="1.5" opacity="0.6"/>
+  <line x1="84" y1="62" x2="64" y2="40" stroke="#93C5FD" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- The Grand Bridge Arch (Setu) -->
+  <path d="M 22 84 C 40 50, 88 50, 106 84" fill="none" stroke="url(#bridgeGrad)" stroke-width="6.5" stroke-linecap="round"/>
+
+  <!-- Road Deck Span -->
+  <path d="M 20 86 Q 64 78 108 86" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- River / Water Reflection Ripple -->
+  <path d="M 38 98 C 50 94, 78 94, 90 98" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 46 104 C 54 101, 74 101, 82 104" fill="none" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Central AI Neural Star (Intelligence Node) -->
+  <g transform="translate(64, 40)">
+    <!-- Star Glow Outer -->
+    <circle cx="0" cy="0" r="14" fill="#F59E0B" opacity="0.25"/>
+    <circle cx="0" cy="0" r="8" fill="#FDE047" opacity="0.4"/>
+
+    <!-- 4-Pointed Spark (Gemini / AI emblem) -->
+    <path d="M 0 -13 Q 0 0 13 0 Q 0 0 0 13 Q 0 0 -13 0 Q 0 0 0 -13 Z" fill="url(#starGrad)"/>
+    <circle cx="0" cy="0" r="3" fill="#FFFFFF"/>
+  </g>
+</svg>
