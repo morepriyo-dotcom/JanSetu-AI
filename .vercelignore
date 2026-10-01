@@ -8,3 +8,4 @@ Dockerfile
 .dockerignore
 .git/
 README.md
+*.pptx
