@@ -42,8 +42,10 @@ export default function ReportComplaintPage() {
   // Pre-fill user profile if logged in
   React.useEffect(() => {
     if (user) {
-      if (!citizenName) setCitizenName(user.name);
-      if (!citizenPhone && user.phoneNumber) setCitizenPhone(user.phoneNumber);
+      setCitizenName((prev) => prev || user.name);
+      if (user.phoneNumber) {
+        setCitizenPhone((prev) => prev || user.phoneNumber || "");
+      }
     }
   }, [user]);
 
@@ -551,6 +553,7 @@ export default function ReportComplaintPage() {
 
               {imagePreview ? (
                 <div className="relative inline-block mt-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imagePreview}
                     alt="Problem preview"
@@ -736,7 +739,7 @@ export default function ReportComplaintPage() {
                 <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold">Location Required: </span>
-                  Gemini noted that this civic complaint lacks a specific location or landmark. Please type a landmark above or click "Use My Current Location".
+                  Gemini noted that this civic complaint lacks a specific location or landmark. Please type a landmark above or click &quot;Use My Current Location&quot;.
                 </div>
               </div>
             )}

@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 import { isConfigValid, testFirebaseConnection } from "@/lib/firebase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;

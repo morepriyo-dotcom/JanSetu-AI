@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 // Cache for recent geocoding lookups (1 hour TTL)
 const cache = new Map<string, { address: string; timestamp: number }>();
 const CACHE_TTL = 3600 * 1000;

@@ -4,15 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node -e \"try{require('fs').rmSync('.next',{recursive:true,force:true})}catch(e){}\" && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "next lint"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
     "clsx": "^2.1.1",
     "firebase": "^11.4.0",
-    "firebase-functions": "^7.4.0",
     "lucide-react": "^1.16.0",
     "next": "^15.1.7",
     "react": "^19.0.0",
@@ -31,17 +30,8 @@
     "typescript": "^5.7.3"
   },
   "allowScripts": {
-    "protobufjs": true,
-    "@firebase/util": true
-  },
-  "trustedDependencies": [
-    "protobufjs",
-    "@firebase/util"
-  ],
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "protobufjs",
-      "@firebase/util"
-    ]
+    "@firebase/util@1.12.1": true,
+    "protobufjs@7.6.6": true,
+    "unrs-resolver@1.12.2": true
   }
 }

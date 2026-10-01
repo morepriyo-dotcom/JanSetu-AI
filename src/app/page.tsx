@@ -143,7 +143,7 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="mt-4 p-3 bg-slate-50 rounded-lg text-xs font-mono text-slate-700 border border-slate-200">
-              "Huge pothole near my college and two people almost fell yesterday."
+              &quot;Huge pothole near my college and two people almost fell yesterday.&quot;
             </div>
           </div>
 

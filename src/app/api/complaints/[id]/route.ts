@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getComplaintById, updateComplaintStatus } from "@/lib/complaintsStore";
 import { ComplaintStatus } from "@/types/complaint";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

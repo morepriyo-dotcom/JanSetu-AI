@@ -1,0 +1,10 @@
+# Files and directories to ignore when deploying to Vercel
+functions/
+dataconnect/
+.firebase/
+firestore.rules
+firestore.indexes.json
+Dockerfile
+.dockerignore
+.git/
+README.md

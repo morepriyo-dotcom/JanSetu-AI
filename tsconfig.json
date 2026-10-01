@@ -30,8 +30,6 @@
   ],
   "exclude": [
     "node_modules",
-    "functions",
-    "functions/**",
     ".firebase",
     "dist"
   ]

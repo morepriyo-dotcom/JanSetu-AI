@@ -224,7 +224,7 @@ export function ComplaintDetailViewer({ initialComplaint, id }: ComplaintDetailV
             <span>Original Complaint Description</span>
           </h3>
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-            "{complaint.description}"
+            &quot;{complaint.description}&quot;
           </div>
         </div>
 
@@ -259,6 +259,7 @@ export function ComplaintDetailViewer({ initialComplaint, id }: ComplaintDetailV
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">Photo Evidence</h3>
             {complaint.imageUrl ? (
               <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xs max-h-48">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={complaint.imageUrl}
                   alt={complaint.title}
