@@ -1,0 +1,39 @@
+# CodeRabbit Configuration File
+# Documentation: https://docs.coderabbit.ai/guides/configure-coderabbit
+
+version: "2"
+language: "en-US"
+tone_instructions: "Be concise, constructive, and prioritize production readiness, performance, and security."
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+      - "master"
+      - "develop"
+
+  path_filters:
+    - "!node_modules/**"
+    - "!.next/**"
+    - "!package-lock.json"
+    - "!**/*.min.js"
+    - "!**/*.pptx"
+
+  path_instructions:
+    - path: "src/app/api/**/*.ts"
+      instructions: "Ensure server routes that access request URLs or searchParams include 'export const dynamic = \"force-dynamic\"'. Validate all request JSON bodies before processing."
+    - path: "src/app/**/page.tsx"
+      instructions: "Ensure client components using useSearchParams() are wrapped inside React Suspense boundaries. Check for unescaped HTML entities in JSX."
+    - path: "src/lib/gemini.ts"
+      instructions: "Verify strict JSON schema validation for Google Gemini responses. Ensure resilient heuristic fallback is maintained."
+
+chat:
+  auto_reply: true
